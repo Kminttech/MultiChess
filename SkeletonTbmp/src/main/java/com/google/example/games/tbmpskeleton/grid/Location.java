@@ -72,6 +72,11 @@ public class Location {
         return row;
     }
 
+    @Override
+    public int hashCode() {
+        return row * 3737 + col;
+    }
+
     /**
      * @return A copy of this location.
      */

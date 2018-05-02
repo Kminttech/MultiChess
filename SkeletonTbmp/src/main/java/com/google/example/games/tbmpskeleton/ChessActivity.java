@@ -50,6 +50,7 @@ import com.google.example.games.tbmpskeleton.pieces.ChessPiece;
 import com.google.example.games.tbmpskeleton.pieces.King;
 import com.google.example.games.tbmpskeleton.pieces.Knight;
 import com.google.example.games.tbmpskeleton.pieces.Pawn;
+import com.google.example.games.tbmpskeleton.pieces.Queen;
 import com.google.example.games.tbmpskeleton.pieces.Rook;
 
 import java.util.ArrayList;
@@ -264,25 +265,6 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     }
 
     // In-game controls
-
-
-    // Cancel the game. Should possibly wait until the game is canceled before
-    // giving up on the view.
-//    public void onCancelClicked(View view) {
-//        showSpinner();
-//
-//        mTurnBasedMultiplayerClient.cancelMatch(mMatch.getMatchId())
-//                .addOnSuccessListener(new OnSuccessListener<String>() {
-//                    @Override
-//                    public void onSuccess(String matchId) {
-//                        onCancelMatch(matchId);
-//                    }
-//                })
-//                .addOnFailureListener(createFailureListener("There was a problem cancelling the match!"));
-//
-//        isDoingTurn = false;
-//        setViewVisibility();
-//    }
 //
 //    // Leave the game during your turn. Note that there is a separate
 //    // mTurnBasedMultiplayerClient.leaveMatch() if you want to leave NOT on your turn.
@@ -377,8 +359,12 @@ public class ChessActivity extends Activity implements View.OnClickListener {
 
     // Switch to gameplay view.
     public void setGameplayUI() {
-        isDoingTurn = true;
-        setViewVisibility();
+        squares = new Square[8][8];
+        game = new ChessGame(mTurnData.data);
+        game.setPlayerWhite(true);
+        generateBoard();
+        findViewById(R.id.matchup_layout).setVisibility(View.GONE);
+        findViewById(R.id.gameplay_layout).setVisibility(View.VISIBLE);
     }
 
     // Helpful dialogs
@@ -634,7 +620,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     // UI.
     public void startMatch(TurnBasedMatch match) {
         squares = new Square[8][8];
-        game = new ChessGame(new ChessBoard());
+        game = new ChessGame();
         game.setPlayerWhite(true);
         generateBoard();
         findViewById(R.id.matchup_layout).setVisibility(View.GONE);
@@ -930,6 +916,8 @@ public class ChessActivity extends Activity implements View.OnClickListener {
                         s.setImageResource(p.isWhite() ? R.drawable.whitebishop : R.drawable.blackbishop);
                     } else if (p instanceof Rook) {
                         s.setImageResource(p.isWhite() ? R.drawable.whiterook : R.drawable.blackrook);
+                    } else if (p instanceof Queen) {
+                        s.setImageResource(p.isWhite() ? R.drawable.whitequeen : R.drawable.blackqueen);
                     } else if (p instanceof King) {
                         s.setImageResource(p.isWhite() ? R.drawable.whiteking : R.drawable.blackking);
                     } else
@@ -1061,45 +1049,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
                             }
                         }
                     });
-
-                    // black back row
-                    if (r == 7) {
-                        if (c == 0 || c == 7) {
-                            im.setImageResource(R.drawable.blackrook);
-                        } else if (c == 1 || c == 6) {
-                            im.setImageResource(R.drawable.blackknight);
-                        } else if (c == 2 || c == 5) {
-                            im.setImageResource(R.drawable.blackbishop);
-                        } else if (c == 3) {
-                            im.setImageResource(R.drawable.blackqueen);
-                        } else if (c == 4) {
-                            im.setImageResource(R.drawable.blackking);
-                        }
-                    }
-                    // black pawns
-                    else if (r == 6) {
-                        im.setImageResource(R.drawable.blackpawn);
-                    }
-                    // white pawns
-                    else if (r == 1) {
-                        im.setImageResource(R.drawable.whitepawn);
-                    }
-                    // white back row
-                    else if (r == 0) {
-                        if (c == 0 || c == 7) {
-                            im.setImageResource(R.drawable.whiterook);
-                        } else if (c == 1 || c == 6) {
-                            im.setImageResource(R.drawable.whiteknight);
-                        } else if (c == 2 || c == 5) {
-                            im.setImageResource(R.drawable.whitebishop);
-                        } else if (c == 3) {
-                            im.setImageResource(R.drawable.whitequeen);
-                        } else if (c == 4) {
-                            im.setImageResource(R.drawable.whiteking);
-                        }
-                    } else {
-                        im.setImageResource(R.drawable.transparent);
-                    }
+                    im.setImageResource(R.drawable.transparent);
                     im.setAdjustViewBounds(true);
                     if (squares[r][c].isWhite()) {
                         im.setBackgroundColor(Color.WHITE);
@@ -1230,45 +1180,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
                             }
                         }
                     });
-
-                    // black back row
-                    if (r == 7) {
-                        if (c == 0 || c == 7) {
-                            im.setImageResource(R.drawable.blackrook);
-                        } else if (c == 1 || c == 6) {
-                            im.setImageResource(R.drawable.blackknight);
-                        } else if (c == 2 || c == 5) {
-                            im.setImageResource(R.drawable.blackbishop);
-                        } else if (c == 3) {
-                            im.setImageResource(R.drawable.blackqueen);
-                        } else if (c == 4) {
-                            im.setImageResource(R.drawable.blackking);
-                        }
-                    }
-                    // black pawns
-                    else if (r == 6) {
-                        im.setImageResource(R.drawable.blackpawn);
-                    }
-                    // white pawns
-                    else if (r == 1) {
-                        im.setImageResource(R.drawable.whitepawn);
-                    }
-                    // white back row
-                    else if (r == 0) {
-                        if (c == 0 || c == 7) {
-                            im.setImageResource(R.drawable.whiterook);
-                        } else if (c == 1 || c == 6) {
-                            im.setImageResource(R.drawable.whiteknight);
-                        } else if (c == 2 || c == 5) {
-                            im.setImageResource(R.drawable.whitebishop);
-                        } else if (c == 3) {
-                            im.setImageResource(R.drawable.whitequeen);
-                        } else if (c == 4) {
-                            im.setImageResource(R.drawable.whiteking);
-                        }
-                    } else {
-                        im.setImageResource(R.drawable.transparent);
-                    }
+                    im.setImageResource(R.drawable.transparent);
                     im.setAdjustViewBounds(true);
                     if (squares[r][c].isWhite()) {
                         im.setBackgroundColor(Color.WHITE);
@@ -1300,6 +1212,6 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     public void reset() {
         squares = new Square[8][8];
         generateBoard();
-        game = new ChessGame(new ChessBoard());
+        game = new ChessGame();
     }
 }

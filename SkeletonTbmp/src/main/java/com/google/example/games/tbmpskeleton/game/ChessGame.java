@@ -51,6 +51,18 @@ public class ChessGame {
         this.black_locs = new HashSet(16);
         this.white_locs = new HashSet(16);
         this.whiteTurn = true;
+        updateControlledLocations();
+        for (ChessPiece p : chessPieces) {
+            p.update();
+        }
+    }
+
+    public ChessGame(){
+        super();
+        this.grid = new ChessBoard();
+        this.black_locs = new HashSet(16);
+        this.white_locs = new HashSet(16);
+        this.whiteTurn = true;
         defaultPosition();
         updateControlledLocations();
         for (ChessPiece p : chessPieces) {
@@ -208,12 +220,12 @@ public class ChessGame {
 
         Queen q1, q2;
         q1 = new Queen(true, this, new Location(0, 3));
-        q2 = new Queen(false, this, new Location(0, 3));
+        q2 = new Queen(false, this, new Location(7, 3));
         chessPieces.add(q1);
         chessPieces.add(q2);
 
         // Pawns
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 8; i++) {
             Pawn p1 = new Pawn(true, this, new Location(1, i));
             Pawn p2 = new Pawn(false, this, new Location(6, i));
             chessPieces.add(p1);
@@ -223,7 +235,7 @@ public class ChessGame {
         // Knights
         Knight n1, n2, n3, n4;
         n1 = new Knight(true, this, new Location(0, 1));
-        n2 = new Knight(true, this, new Location(0, 7));
+        n2 = new Knight(true, this, new Location(0, 6));
         n3 = new Knight(false, this, new Location(7, 1));
         n4 = new Knight(false, this, new Location(7, 6));
         chessPieces.add(n1);
