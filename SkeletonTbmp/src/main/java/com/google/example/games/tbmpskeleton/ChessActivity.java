@@ -641,7 +641,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    //TODO implement chess
+    //TODO implement chess determine color
     // startMatch() happens in response to the createTurnBasedMatch()
     // above. This is only called on success, so we should have a
     // valid match object. We're taking this opportunity to setup the
@@ -972,6 +972,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
                                     Location src = selectedLocation;
                                     Location dest = new Location(x, y);
                                     try {
+                                        //TODO Switch Turn
                                         boolean inCheck = game.move(src, dest);
                                         if (inCheck) {
                                             Toast.makeText(getBaseContext(), "Check!", Toast.LENGTH_LONG).show();

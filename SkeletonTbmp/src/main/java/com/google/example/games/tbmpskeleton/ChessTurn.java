@@ -18,6 +18,8 @@ package com.google.example.games.tbmpskeleton;
 
 import android.util.Log;
 
+import com.google.example.games.tbmpskeleton.grid.ChessBoard;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,68 +32,65 @@ import java.nio.charset.Charset;
  * @author wolff
  */
 public class ChessTurn {
+    public static final String TAG = "EBTurn";
+    public ChessBoard data;
 
-  public static final String TAG = "EBTurn";
-
-  public String data = "";
-  public int turnCounter;
-
-  public ChessTurn() {
-  }
-
-  // This is the byte array we will write out to the TBMP API.
-  public byte[] persist() {
-    JSONObject retVal = new JSONObject();
-
-    try {
-      retVal.put("data", data);
-      retVal.put("turnCounter", turnCounter);
-
-    } catch (JSONException e) {
-      Log.e("ChessTurn", "There was an issue writing JSON!", e);
+    public ChessTurn() {
+        data = new ChessBoard();
     }
 
-    String st = retVal.toString();
-
-    Log.d(TAG, "==== PERSISTING\n" + st);
-
-    return st.getBytes(Charset.forName("UTF-8"));
-  }
-
-  // Creates a new instance of ChessTurn.
-  static public ChessTurn unpersist(byte[] byteArray) {
-
-    if (byteArray == null) {
-      Log.d(TAG, "Empty array---possible bug.");
-      return new ChessTurn();
+    public ChessTurn(ChessBoard curBoard) {
+        data = curBoard;
     }
 
-    String st = null;
-    try {
-      st = new String(byteArray, "UTF-8");
-    } catch (UnsupportedEncodingException e1) {
-      e1.printStackTrace();
-      return null;
+    // This is the byte array we will write out to the TBMP API.
+    public byte[] persist() {
+        JSONObject retVal = new JSONObject();
+
+        try {
+            retVal.put("data", data);
+
+        } catch (JSONException e) {
+            Log.e("ChessTurn", "There was an issue writing JSON!", e);
+        }
+
+        String st = retVal.toString();
+
+        Log.d(TAG, "==== PERSISTING\n" + st);
+
+        return st.getBytes(Charset.forName("UTF-8"));
     }
 
-    Log.d(TAG, "====UNPERSIST \n" + st);
+    // Creates a new instance of ChessTurn.
+    static public ChessTurn unpersist(byte[] byteArray) {
 
-    ChessTurn retVal = new ChessTurn();
+        if (byteArray == null) {
+            Log.d(TAG, "Empty array---possible bug.");
+            return new ChessTurn();
+        }
 
-    try {
-      JSONObject obj = new JSONObject(st);
+        String st = null;
+        try {
+            st = new String(byteArray, "UTF-8");
+        } catch (UnsupportedEncodingException e1) {
+            e1.printStackTrace();
+            return null;
+        }
 
-      if (obj.has("data")) {
-        retVal.data = obj.getString("data");
-      }
-      if (obj.has("turnCounter")) {
-        retVal.turnCounter = obj.getInt("turnCounter");
-      }
+        Log.d(TAG, "====UNPERSIST \n" + st);
 
-    } catch (JSONException e) {
-      Log.e("ChessTurn", "There was an issue parsing JSON!", e);
+        ChessTurn retVal = new ChessTurn();
+
+        try {
+            JSONObject obj = new JSONObject(st);
+
+            if (obj.has("data")) {
+                retVal.data = (ChessBoard) obj.get("data");
+            }
+        } catch (JSONException e) {
+            Log.e("ChessTurn", "There was an issue parsing JSON!", e);
+        }
+
+        return retVal;
     }
-
-    return retVal;
-  }
 }
