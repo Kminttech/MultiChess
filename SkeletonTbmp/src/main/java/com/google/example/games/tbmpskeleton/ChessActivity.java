@@ -90,8 +90,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     private InvitationsClient mInvitationsClient = null;
 
     // Local convenience pointers
-    public TextView mDataView;
-    public TextView mTurnTextView;
+    private String mMyPlayerId;
 
     private AlertDialog mAlertDialog;
 
@@ -651,8 +650,9 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     // UI.
     public void startMatch(TurnBasedMatch match) {
         squares = new Square[8][8];
-        generateBoard();
         game = new ChessGame(new ChessBoard());
+        game.setPlayerWhite(true);
+        generateBoard();
         findViewById(R.id.matchup_layout).setVisibility(View.GONE);
         findViewById(R.id.gameplay_layout).setVisibility(View.VISIBLE);
 
@@ -867,7 +867,6 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         switch (statusCode) {
             case GamesCallbackStatusCodes.OK:
                 return true;
-
             case GamesClientStatusCodes.MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER:
                 showErrorMessage(R.string.status_multiplayer_error_not_trusted_tester);
                 break;
@@ -895,6 +894,27 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         return false;
     }
 
+    private void playTurn(TurnBasedMatch match) {
+        String nextParticipantId = getNextParticipantId();
+
+        // This calls a game specific method to get the bytes that represent the game state
+        // including the current player's turn.
+        byte[] gameData = new ChessTurn(game.getGrid()).persist();
+
+        Games.getTurnBasedMultiplayerClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                .takeTurn(match.getMatchId(), gameData, nextParticipantId)
+                .addOnCompleteListener(new OnCompleteListener<TurnBasedMatch>() {
+                    @Override
+                    public void onComplete(@NonNull Task<TurnBasedMatch> task) {
+                        if (task.isSuccessful()) {
+                            TurnBasedMatch match = task.getResult();
+                        } else {
+                            // Handle exceptions.
+                        }
+                    }
+                });
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -912,8 +932,8 @@ public class ChessActivity extends Activity implements View.OnClickListener {
 
     private void renderBoard() {
         ChessBoard board = game.getGrid();
-        for (int rank = 8; rank >= 0; rank--) {
-            for (int file = 0; file <= 8; file++) {
+        for (int rank = 7; rank >= 0; rank--) {
+            for (int file = 0; file <= 7; file++) {
                 Square s = squares[rank][file];
                 Location loc = new Location(rank, file);
                 if (board.isOccupied(loc)) {
@@ -940,78 +960,26 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         boardVertical = findViewById(R.id.gameplay_layout);
 
         setupBoard();
-        //TODO Flip board if black player
-        for (int r = 7; r >= 0; r--) {
-            LinearLayout tr = new LinearLayout(this);
-            tr.removeAllViews();
-            tr.invalidate();
-            tr.refreshDrawableState();
-            boardVertical.addView(tr);
-            tr.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        if(game.isPlayerWhite()) {
+            for (int r = 7; r >= 0; r--) {
+                LinearLayout tr = new LinearLayout(this);
+                tr.removeAllViews();
+                tr.invalidate();
+                tr.refreshDrawableState();
+                boardVertical.addView(tr);
+                tr.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-            for (int c = 0; c <= 7; c++) {
-                final int x = r, y = c;
-                Square im = squares[r][c];
-                im.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (selected != null) {
-                            if (selected instanceof Square) {
-                                if (squares[x][y] == selected) {
-                                    squares[x][y].setBackgroundColor(squares[x][y].isWhite() ? Color.WHITE : Color.GRAY);
-                                    for (int i = 0; i < squares.length; i++) {
-                                        for (int j = 0; j < squares[i].length; j++) {
-                                            if (possibleMoves.contains(squares[i][j].getLocation())) {
-                                                squares[i][j].setBackgroundColor(squares[i][j].isWhite() ? Color.WHITE : Color.GRAY);
-                                            }
-                                        }
-                                    }
-                                    possibleMoves = null;
-                                    selected = null;
-                                    return;
-                                } else {
-                                    Location src = selectedLocation;
-                                    Location dest = new Location(x, y);
-                                    try {
-                                        //TODO Switch Turn
-                                        boolean inCheck = game.move(src, dest);
-                                        if (inCheck) {
-                                            Toast.makeText(getBaseContext(), "Check!", Toast.LENGTH_LONG).show();
-                                        }
-                                        if (game.isCheckmate()) {
-                                            Toast.makeText(getBaseContext(), "Game Over!", Toast.LENGTH_LONG).show();
-                                        }
-                                        renderBoard();
-                                    } catch (IllegalMoveException e) {
-                                        StringBuilder sb = new StringBuilder();
-                                        sb.append(e.getChessPiece() + " cannot move to " + e.getLocation() + ".");
-                                        sb.append('\n');
-
-                                        ArrayList<Location> locs = e.getChessPiece().getMoves();
-                                        if (locs.isEmpty())
-                                            sb.append("This piece has no available moves.");
-                                        else {
-                                            sb.append(e.getChessPiece() + " can move to: ");
-                                            for (Location loc : e.getChessPiece().getMoves()) {
-                                                sb.append(loc);
-                                                sb.append(' ');
-                                            }
-                                        }
-                                        Toast.makeText(getBaseContext(), sb.toString(), Toast.LENGTH_LONG).show();
-                                        return;
-                                    } catch (InCheckException e) {
-                                        StringBuilder sb = new StringBuilder();
-                                        sb.append("Unable to make the move " + src.toString() + " to " + dest.toString() + " while in check.\n");
-                                        sb.append("You can make the following moves:");
-                                        for (Move available : e.getAvailableMoves()) {
-                                            sb.append(available.toString() + ", ");
-                                        }
-                                        Toast.makeText(getBaseContext(), sb.toString(), Toast.LENGTH_LONG).show();
-                                        return;
-                                    } finally {
-                                        if (selected instanceof Square) {
-                                            Square temp = (Square) selected;
-                                            temp.setBackgroundColor(temp.isWhite() ? Color.WHITE : Color.GRAY);
+                for (int c = 0; c <= 7; c++) {
+                    final int x = r, y = c;
+                    Square im = squares[r][c];
+                    im.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (game.isPlayerWhite() == game.isWhitesTurn()) {
+                                if (selected != null) {
+                                    if (selected instanceof Square) {
+                                        if (squares[x][y] == selected) {
+                                            squares[x][y].setBackgroundColor(squares[x][y].isWhite() ? Color.WHITE : Color.GRAY);
                                             for (int i = 0; i < squares.length; i++) {
                                                 for (int j = 0; j < squares[i].length; j++) {
                                                     if (possibleMoves.contains(squares[i][j].getLocation())) {
@@ -1021,92 +989,317 @@ public class ChessActivity extends Activity implements View.OnClickListener {
                                             }
                                             possibleMoves = null;
                                             selected = null;
-                                            selectedLocation = null;
+                                            return;
+                                        } else {
+                                            Location src = selectedLocation;
+                                            Location dest = new Location(x, y);
+                                            try {
+                                                boolean inCheck = game.move(src, dest);
+                                                if (inCheck) {
+                                                    Toast.makeText(getBaseContext(), "Check!", Toast.LENGTH_LONG).show();
+                                                }
+                                                if (game.isCheckmate()) {
+                                                    Toast.makeText(getBaseContext(), "Game Over!", Toast.LENGTH_LONG).show();
+                                                }
+                                                renderBoard();
+                                                playTurn(mMatch);
+                                            } catch (IllegalMoveException e) {
+                                                StringBuilder sb = new StringBuilder();
+                                                sb.append(e.getChessPiece() + " cannot move to " + e.getLocation() + ".");
+                                                sb.append('\n');
+
+                                                ArrayList<Location> locs = e.getChessPiece().getMoves();
+                                                if (locs.isEmpty())
+                                                    sb.append("This piece has no available moves.");
+                                                else {
+                                                    sb.append(e.getChessPiece() + " can move to: ");
+                                                    for (Location loc : e.getChessPiece().getMoves()) {
+                                                        sb.append(loc);
+                                                        sb.append(' ');
+                                                    }
+                                                }
+                                                Toast.makeText(getBaseContext(), sb.toString(), Toast.LENGTH_LONG).show();
+                                                return;
+                                            } catch (InCheckException e) {
+                                                StringBuilder sb = new StringBuilder();
+                                                sb.append("Unable to make the move " + src.toString() + " to " + dest.toString() + " while in check.\n");
+                                                sb.append("You can make the following moves:");
+                                                for (Move available : e.getAvailableMoves()) {
+                                                    sb.append(available.toString() + ", ");
+                                                }
+                                                Toast.makeText(getBaseContext(), sb.toString(), Toast.LENGTH_LONG).show();
+                                                return;
+                                            } finally {
+                                                if (selected instanceof Square) {
+                                                    Square temp = (Square) selected;
+                                                    temp.setBackgroundColor(temp.isWhite() ? Color.WHITE : Color.GRAY);
+                                                    for (int i = 0; i < squares.length; i++) {
+                                                        for (int j = 0; j < squares[i].length; j++) {
+                                                            if (possibleMoves.contains(squares[i][j].getLocation())) {
+                                                                squares[i][j].setBackgroundColor(squares[i][j].isWhite() ? Color.WHITE : Color.GRAY);
+                                                            }
+                                                        }
+                                                    }
+                                                    possibleMoves = null;
+                                                    selected = null;
+                                                    selectedLocation = null;
+                                                }
+                                            }
                                         }
                                     }
-                                }
-                            }
-                        } else {
-                            Location loc = new Location(x, y);
-                            if (game.getGrid().get(loc) == null) {
-                                return;
-                            }
-
-                            ChessPiece p = game.getGrid().get(loc);
-                            if (p.isWhite() != game.isWhitesTurn()) {
-                                Toast.makeText(getBaseContext(), "You can only move your own pieces.\nIt's "
-                                                + (game.isWhitesTurn() ? "white's" : "black's") + " turn.",
-                                        Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                            // select this piece
-                            squares[x][y].toggleSelected();
-                            selected = squares[x][y];
-                            possibleMoves = p.getMoves();
-                            for (int i = 0; i < squares.length; i++) {
-                                for (int j = 0; j < squares[i].length; j++) {
-                                    if (possibleMoves.contains(squares[i][j].getLocation())) {
-                                        squares[i][j].setBackgroundColor(Color.BLUE);
+                                } else {
+                                    Location loc = new Location(x, y);
+                                    if (game.getGrid().get(loc) == null) {
+                                        return;
                                     }
+
+                                    ChessPiece p = game.getGrid().get(loc);
+                                    if (p.isWhite() != game.isWhitesTurn()) {
+                                        Toast.makeText(getBaseContext(), "You can only move your own pieces.\nIt's "
+                                                        + (game.isWhitesTurn() ? "white's" : "black's") + " turn.",
+                                                Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    // select this piece
+                                    squares[x][y].toggleSelected();
+                                    selected = squares[x][y];
+                                    possibleMoves = p.getMoves();
+                                    for (int i = 0; i < squares.length; i++) {
+                                        for (int j = 0; j < squares[i].length; j++) {
+                                            if (possibleMoves.contains(squares[i][j].getLocation())) {
+                                                squares[i][j].setBackgroundColor(Color.BLUE);
+                                            }
+                                        }
+                                    }
+                                    selectedLocation = new Location(x, y);
+                                    squares[x][y].setBackgroundColor(Color.RED);
                                 }
                             }
-                            selectedLocation = new Location(x, y);
-                            squares[x][y].setBackgroundColor(Color.RED);
+                        }
+                    });
+
+                    // black back row
+                    if (r == 7) {
+                        if (c == 0 || c == 7) {
+                            im.setImageResource(R.drawable.blackrook);
+                        } else if (c == 1 || c == 6) {
+                            im.setImageResource(R.drawable.blackknight);
+                        } else if (c == 2 || c == 5) {
+                            im.setImageResource(R.drawable.blackbishop);
+                        } else if (c == 3) {
+                            im.setImageResource(R.drawable.blackqueen);
+                        } else if (c == 4) {
+                            im.setImageResource(R.drawable.blackking);
                         }
                     }
-                });
-
-                // black back row
-                if (r == 7) {
-                    if (c == 0 || c == 7) {
-                        im.setImageResource(R.drawable.blackrook);
-                    } else if (c == 1 || c == 6) {
-                        im.setImageResource(R.drawable.blackknight);
-                    } else if (c == 2 || c == 5) {
-                        im.setImageResource(R.drawable.blackbishop);
-                    } else if (c == 3){
-                        im.setImageResource(R.drawable.blackqueen);
-                    } else if (c == 4) {
-                        im.setImageResource(R.drawable.blackking);
+                    // black pawns
+                    else if (r == 6) {
+                        im.setImageResource(R.drawable.blackpawn);
                     }
-                }
-                // black pawns
-                else if (r == 6) {
-                    im.setImageResource(R.drawable.blackpawn);
-                }
-                // white pawns
-                else if (r == 1) {
-                    im.setImageResource(R.drawable.whitepawn);
-                }
-                // white back row
-                else if (r == 0) {
-                    if (c == 0 || c == 7) {
-                        im.setImageResource(R.drawable.whiterook);
-                    } else if (c == 1 || c == 6) {
-                        im.setImageResource(R.drawable.whiteknight);
-                    } else if (c == 2 || c == 5) {
-                        im.setImageResource(R.drawable.whitebishop);
-                    } else if (c == 3){
-                        im.setImageResource(R.drawable.whitequeen);
-                    } else if (c == 4){
-                        im.setImageResource(R.drawable.whiteking);
+                    // white pawns
+                    else if (r == 1) {
+                        im.setImageResource(R.drawable.whitepawn);
                     }
-                } else {
-                    im.setImageResource(R.drawable.transparent);
-                }
-                im.setAdjustViewBounds(true);
-                if (squares[r][c].isWhite()) {
-                    im.setBackgroundColor(Color.WHITE);
-                } else {
-                    im.setBackgroundColor(Color.GRAY);
-                }
+                    // white back row
+                    else if (r == 0) {
+                        if (c == 0 || c == 7) {
+                            im.setImageResource(R.drawable.whiterook);
+                        } else if (c == 1 || c == 6) {
+                            im.setImageResource(R.drawable.whiteknight);
+                        } else if (c == 2 || c == 5) {
+                            im.setImageResource(R.drawable.whitebishop);
+                        } else if (c == 3) {
+                            im.setImageResource(R.drawable.whitequeen);
+                        } else if (c == 4) {
+                            im.setImageResource(R.drawable.whiteking);
+                        }
+                    } else {
+                        im.setImageResource(R.drawable.transparent);
+                    }
+                    im.setAdjustViewBounds(true);
+                    if (squares[r][c].isWhite()) {
+                        im.setBackgroundColor(Color.WHITE);
+                    } else {
+                        im.setBackgroundColor(Color.GRAY);
+                    }
 
-                im.setLayoutParams(new TableRow.LayoutParams(
-                        TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT));
-                tr.addView(im);
+                    im.setLayoutParams(new TableRow.LayoutParams(
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            TableRow.LayoutParams.WRAP_CONTENT));
+                    tr.addView(im);
+                }
+            }
+        }else {
+            for (int r = 0; r <= 7; r++) {
+                LinearLayout tr = new LinearLayout(this);
+                tr.removeAllViews();
+                tr.invalidate();
+                tr.refreshDrawableState();
+                boardVertical.addView(tr);
+                tr.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                for (int c = 0; c <= 7; c++) {
+                    final int x = r, y = c;
+                    Square im = squares[r][c];
+                    im.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (game.isPlayerWhite() == game.isWhitesTurn()) {
+                                if (selected != null) {
+                                    if (selected instanceof Square) {
+                                        if (squares[x][y] == selected) {
+                                            squares[x][y].setBackgroundColor(squares[x][y].isWhite() ? Color.WHITE : Color.GRAY);
+                                            for (int i = 0; i < squares.length; i++) {
+                                                for (int j = 0; j < squares[i].length; j++) {
+                                                    if (possibleMoves.contains(squares[i][j].getLocation())) {
+                                                        squares[i][j].setBackgroundColor(squares[i][j].isWhite() ? Color.WHITE : Color.GRAY);
+                                                    }
+                                                }
+                                            }
+                                            possibleMoves = null;
+                                            selected = null;
+                                            return;
+                                        } else {
+                                            Location src = selectedLocation;
+                                            Location dest = new Location(x, y);
+                                            try {
+                                                boolean inCheck = game.move(src, dest);
+                                                if (inCheck) {
+                                                    Toast.makeText(getBaseContext(), "Check!", Toast.LENGTH_LONG).show();
+                                                }
+                                                if (game.isCheckmate()) {
+                                                    Toast.makeText(getBaseContext(), "Game Over!", Toast.LENGTH_LONG).show();
+                                                }
+                                                renderBoard();
+                                                playTurn(mMatch);
+                                            } catch (IllegalMoveException e) {
+                                                StringBuilder sb = new StringBuilder();
+                                                sb.append(e.getChessPiece() + " cannot move to " + e.getLocation() + ".");
+                                                sb.append('\n');
+
+                                                ArrayList<Location> locs = e.getChessPiece().getMoves();
+                                                if (locs.isEmpty())
+                                                    sb.append("This piece has no available moves.");
+                                                else {
+                                                    sb.append(e.getChessPiece() + " can move to: ");
+                                                    for (Location loc : e.getChessPiece().getMoves()) {
+                                                        sb.append(loc);
+                                                        sb.append(' ');
+                                                    }
+                                                }
+                                                Toast.makeText(getBaseContext(), sb.toString(), Toast.LENGTH_LONG).show();
+                                                return;
+                                            } catch (InCheckException e) {
+                                                StringBuilder sb = new StringBuilder();
+                                                sb.append("Unable to make the move " + src.toString() + " to " + dest.toString() + " while in check.\n");
+                                                sb.append("You can make the following moves:");
+                                                for (Move available : e.getAvailableMoves()) {
+                                                    sb.append(available.toString() + ", ");
+                                                }
+                                                Toast.makeText(getBaseContext(), sb.toString(), Toast.LENGTH_LONG).show();
+                                                return;
+                                            } finally {
+                                                if (selected instanceof Square) {
+                                                    Square temp = (Square) selected;
+                                                    temp.setBackgroundColor(temp.isWhite() ? Color.WHITE : Color.GRAY);
+                                                    for (int i = 0; i < squares.length; i++) {
+                                                        for (int j = 0; j < squares[i].length; j++) {
+                                                            if (possibleMoves.contains(squares[i][j].getLocation())) {
+                                                                squares[i][j].setBackgroundColor(squares[i][j].isWhite() ? Color.WHITE : Color.GRAY);
+                                                            }
+                                                        }
+                                                    }
+                                                    possibleMoves = null;
+                                                    selected = null;
+                                                    selectedLocation = null;
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    Location loc = new Location(x, y);
+                                    if (game.getGrid().get(loc) == null) {
+                                        return;
+                                    }
+
+                                    ChessPiece p = game.getGrid().get(loc);
+                                    if (p.isWhite() != game.isWhitesTurn()) {
+                                        Toast.makeText(getBaseContext(), "You can only move your own pieces.\nIt's "
+                                                        + (game.isWhitesTurn() ? "white's" : "black's") + " turn.",
+                                                Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    // select this piece
+                                    squares[x][y].toggleSelected();
+                                    selected = squares[x][y];
+                                    possibleMoves = p.getMoves();
+                                    for (int i = 0; i < squares.length; i++) {
+                                        for (int j = 0; j < squares[i].length; j++) {
+                                            if (possibleMoves.contains(squares[i][j].getLocation())) {
+                                                squares[i][j].setBackgroundColor(Color.BLUE);
+                                            }
+                                        }
+                                    }
+                                    selectedLocation = new Location(x, y);
+                                    squares[x][y].setBackgroundColor(Color.RED);
+                                }
+                            }
+                        }
+                    });
+
+                    // black back row
+                    if (r == 7) {
+                        if (c == 0 || c == 7) {
+                            im.setImageResource(R.drawable.blackrook);
+                        } else if (c == 1 || c == 6) {
+                            im.setImageResource(R.drawable.blackknight);
+                        } else if (c == 2 || c == 5) {
+                            im.setImageResource(R.drawable.blackbishop);
+                        } else if (c == 3) {
+                            im.setImageResource(R.drawable.blackqueen);
+                        } else if (c == 4) {
+                            im.setImageResource(R.drawable.blackking);
+                        }
+                    }
+                    // black pawns
+                    else if (r == 6) {
+                        im.setImageResource(R.drawable.blackpawn);
+                    }
+                    // white pawns
+                    else if (r == 1) {
+                        im.setImageResource(R.drawable.whitepawn);
+                    }
+                    // white back row
+                    else if (r == 0) {
+                        if (c == 0 || c == 7) {
+                            im.setImageResource(R.drawable.whiterook);
+                        } else if (c == 1 || c == 6) {
+                            im.setImageResource(R.drawable.whiteknight);
+                        } else if (c == 2 || c == 5) {
+                            im.setImageResource(R.drawable.whitebishop);
+                        } else if (c == 3) {
+                            im.setImageResource(R.drawable.whitequeen);
+                        } else if (c == 4) {
+                            im.setImageResource(R.drawable.whiteking);
+                        }
+                    } else {
+                        im.setImageResource(R.drawable.transparent);
+                    }
+                    im.setAdjustViewBounds(true);
+                    if (squares[r][c].isWhite()) {
+                        im.setBackgroundColor(Color.WHITE);
+                    } else {
+                        im.setBackgroundColor(Color.GRAY);
+                    }
+
+                    im.setLayoutParams(new TableRow.LayoutParams(
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            TableRow.LayoutParams.WRAP_CONTENT));
+                    tr.addView(im);
+                }
             }
         }
+        renderBoard();
     }
 
     private void setupBoard() {

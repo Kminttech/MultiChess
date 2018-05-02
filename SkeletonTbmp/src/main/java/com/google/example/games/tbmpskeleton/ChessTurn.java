@@ -26,11 +26,6 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
-/**
- * Basic turn data. It's just a blank data string and a turn number counter.
- *
- * @author wolff
- */
 public class ChessTurn {
     public static final String TAG = "EBTurn";
     public ChessBoard data;

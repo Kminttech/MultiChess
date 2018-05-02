@@ -96,6 +96,10 @@ public class ChessGame {
 
     public boolean isPlayerWhite() { return playerWhite; }
 
+    public void setPlayerWhite(boolean playerWhite) {
+        this.playerWhite = playerWhite;
+    }
+
     /**
      * Moves the piece at the source location to the specified destination. <br>
      * Precondition: There exists a piece at location <code>src</code>.
@@ -195,7 +199,7 @@ public class ChessGame {
      * chessPieces on the grid.
      */
     private void defaultPosition() {
-        chessPieces = new ArrayList<ChessPiece>(32);
+        chessPieces = new ArrayList(32);
         // Kings
         K = new King(true, this, new Location(0, 4));
         k = new King(false, this, new Location(7, 4));
