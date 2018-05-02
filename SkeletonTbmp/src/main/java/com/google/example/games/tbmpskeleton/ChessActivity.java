@@ -282,81 +282,84 @@ public class ChessActivity extends Activity implements View.OnClickListener {
 
     // In-game controls
 
+
     // Cancel the game. Should possibly wait until the game is canceled before
     // giving up on the view.
-    public void onCancelClicked(View view) {
-        showSpinner();
+//    public void onCancelClicked(View view) {
+//        showSpinner();
+//
+//        mTurnBasedMultiplayerClient.cancelMatch(mMatch.getMatchId())
+//                .addOnSuccessListener(new OnSuccessListener<String>() {
+//                    @Override
+//                    public void onSuccess(String matchId) {
+//                        onCancelMatch(matchId);
+//                    }
+//                })
+//                .addOnFailureListener(createFailureListener("There was a problem cancelling the match!"));
+//
+//        isDoingTurn = false;
+//        setViewVisibility();
+//    }
+//
+//    // Leave the game during your turn. Note that there is a separate
+//    // mTurnBasedMultiplayerClient.leaveMatch() if you want to leave NOT on your turn.
+//    public void onLeaveClicked(View view) {
+//        showSpinner();
+//        String nextParticipantId = getNextParticipantId();
+//
+//        mTurnBasedMultiplayerClient.leaveMatchDuringTurn(mMatch.getMatchId(), nextParticipantId)
+//                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void aVoid) {
+//                        onLeaveMatch();
+//                    }
+//                })
+//                .addOnFailureListener(createFailureListener("There was a problem leaving the match!"));
+//
+//        setViewVisibility();
+//    }
+//
+//
+//    // Finish the game. Sometimes, this is your only choice.
+//    public void onFinishClicked(View view) {
+//        showSpinner();
+//        mTurnBasedMultiplayerClient.finishMatch(mMatch.getMatchId())
+//                .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
+//                    @Override
+//                    public void onSuccess(TurnBasedMatch turnBasedMatch) {
+//                        onUpdateMatch(turnBasedMatch);
+//                    }
+//                })
+//                .addOnFailureListener(createFailureListener("There was a problem finishing the match!"));
+//
+//        isDoingTurn = false;
+//        setViewVisibility();
+//    }
+//
+//
+//    // Upload your new gamestate, then take a turn, and pass it on to the next
+//    // player.
+//    public void onDoneClicked(View view) {
+//        showSpinner();
+//
+//        String nextParticipantId = getNextParticipantId();
+//        // Create the next turn
+//        //mTurnData.turnCounter += 1;
+//        //mTurnData.data = mDataView.getText().toString();
+//
+//        mTurnBasedMultiplayerClient.takeTurn(mMatch.getMatchId(),
+//                mTurnData.persist(), nextParticipantId)
+//                .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
+//                    @Override
+//                    public void onSuccess(TurnBasedMatch turnBasedMatch) {
+//                        onUpdateMatch(turnBasedMatch);
+//                    }
+//                })
+//                .addOnFailureListener(createFailureListener("There was a problem taking a turn!"));
+//
+//        mTurnData = null;
+//    }
 
-        mTurnBasedMultiplayerClient.cancelMatch(mMatch.getMatchId())
-                .addOnSuccessListener(new OnSuccessListener<String>() {
-                    @Override
-                    public void onSuccess(String matchId) {
-                        onCancelMatch(matchId);
-                    }
-                })
-                .addOnFailureListener(createFailureListener("There was a problem cancelling the match!"));
-
-        isDoingTurn = false;
-        setViewVisibility();
-    }
-
-    // Leave the game during your turn. Note that there is a separate
-    // mTurnBasedMultiplayerClient.leaveMatch() if you want to leave NOT on your turn.
-    public void onLeaveClicked(View view) {
-        showSpinner();
-        String nextParticipantId = getNextParticipantId();
-
-        mTurnBasedMultiplayerClient.leaveMatchDuringTurn(mMatch.getMatchId(), nextParticipantId)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        onLeaveMatch();
-                    }
-                })
-                .addOnFailureListener(createFailureListener("There was a problem leaving the match!"));
-
-        setViewVisibility();
-    }
-
-    // Finish the game. Sometimes, this is your only choice.
-    public void onFinishClicked(View view) {
-        showSpinner();
-        mTurnBasedMultiplayerClient.finishMatch(mMatch.getMatchId())
-                .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
-                    @Override
-                    public void onSuccess(TurnBasedMatch turnBasedMatch) {
-                        onUpdateMatch(turnBasedMatch);
-                    }
-                })
-                .addOnFailureListener(createFailureListener("There was a problem finishing the match!"));
-
-        isDoingTurn = false;
-        setViewVisibility();
-    }
-
-
-    // Upload your new gamestate, then take a turn, and pass it on to the next
-    // player.
-    public void onDoneClicked(View view) {
-        showSpinner();
-
-        String nextParticipantId = getNextParticipantId();
-        // Create the next turn
-        mTurnData.turnCounter += 1;
-        mTurnData.data = mDataView.getText().toString();
-
-        mTurnBasedMultiplayerClient.takeTurn(mMatch.getMatchId(),
-                mTurnData.persist(), nextParticipantId)
-                .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
-                    @Override
-                    public void onSuccess(TurnBasedMatch turnBasedMatch) {
-                        onUpdateMatch(turnBasedMatch);
-                    }
-                })
-                .addOnFailureListener(createFailureListener("There was a problem taking a turn!"));
-
-        mTurnData = null;
-    }
 
     // Sign-in, Sign out behavior
 
@@ -393,8 +396,6 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     public void setGameplayUI() {
         isDoingTurn = true;
         setViewVisibility();
-        mDataView.setText(mTurnData.data);
-        mTurnTextView.setText(getString(R.string.turn_label, mTurnData.turnCounter));
     }
 
     // Helpful dialogs
