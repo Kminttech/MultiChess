@@ -136,9 +136,9 @@ public class ChessActivity extends Activity implements View.OnClickListener {
 
     private String mDisplayName;
     private String mPlayerId;
-
     private void onConnected(GoogleSignInAccount googleSignInAccount) {
         Log.d(TAG, "onConnected(): connected to Google APIs");
+
 
         mTurnBasedMultiplayerClient = Games.getTurnBasedMultiplayerClient(this, googleSignInAccount);
         mInvitationsClient = Games.getInvitationsClient(this, googleSignInAccount);
@@ -204,7 +204,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         setViewVisibility();
     }
 
-    // This is a helper functio that will do all the setup to create a simple failure message.
+    // This is a helper function that will do all the setup to create a simple failure message.
     // Add it to any task and in the case of an failure, it will report the string in an alert
     // dialog.
     private OnFailureListener createFailureListener(final String string) {
@@ -531,8 +531,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
 
         if (requestCode == RC_SIGN_IN) {
 
-            Task<GoogleSignInAccount> task =
-                    GoogleSignIn.getSignedInAccountFromIntent(intent);
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(intent);
 
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
@@ -559,8 +558,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
                 return;
             }
 
-            TurnBasedMatch match = intent
-                    .getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
+            TurnBasedMatch match = intent.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
 
             if (match != null) {
                 updateMatch(match);
@@ -578,8 +576,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
             }
 
             // get the invitee list
-            ArrayList<String> invitees = intent
-                    .getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
+            ArrayList<String> invitees = intent.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
 
             // get automatch criteria
             Bundle autoMatchCriteria;
