@@ -1,8 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion android_compile_version
-
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.google.example.kevin.skeleton"
         minSdkVersion android_min_sdk_version
@@ -10,13 +9,13 @@ android {
         versionCode 1
         versionName "1.0"
     }
-
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt')
         }
     }
+    buildToolsVersion '27.0.3'
 }
 
 dependencies {

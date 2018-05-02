@@ -652,6 +652,8 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         squares = new Square[8][8];
         generateBoard();
         game = new ChessGame(new ChessBoard());
+        findViewById(R.id.matchup_layout).setVisibility(View.GONE);
+        findViewById(R.id.gameplay_layout).setVisibility(View.VISIBLE);
 
 //        mTurnData = new ChessTurn();
 //        // Some basic turn data
@@ -1098,8 +1100,8 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     }
 
     private void setupBoard() {
-        for (int x = 8; x >= 0; x--) {
-            for (int y = 0; y <= 8; y++) {
+        for (int x = 7; x >= 0; x--) {
+            for (int y = 0; y <= 7; y++) {
                 final int r = x;
                 final int c = y;
                 Location location = new Location(r, c);
