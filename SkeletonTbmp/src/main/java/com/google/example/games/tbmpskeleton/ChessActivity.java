@@ -1062,6 +1062,10 @@ public class ChessActivity extends Activity implements View.OnClickListener {
                         im.setImageResource(R.drawable.blackknight);
                     } else if (c == 2 || c == 5) {
                         im.setImageResource(R.drawable.blackbishop);
+                    } else if (c == 3){
+                        im.setImageResource(R.drawable.blackqueen);
+                    } else if (c == 4) {
+                        im.setImageResource(R.drawable.blackking);
                     }
                 }
                 // black pawns
@@ -1075,11 +1079,15 @@ public class ChessActivity extends Activity implements View.OnClickListener {
                 // white back row
                 else if (r == 0) {
                     if (c == 0 || c == 7) {
-                        im.setImageResource(R.drawable.blackrook);
+                        im.setImageResource(R.drawable.whiterook);
                     } else if (c == 1 || c == 6) {
-                        im.setImageResource(R.drawable.blackknight);
+                        im.setImageResource(R.drawable.whiteknight);
                     } else if (c == 2 || c == 5) {
-                        im.setImageResource(R.drawable.blackbishop);
+                        im.setImageResource(R.drawable.whitebishop);
+                    } else if (c == 3){
+                        im.setImageResource(R.drawable.whitequeen);
+                    } else if (c == 4){
+                        im.setImageResource(R.drawable.whiteking);
                     }
                 } else {
                     im.setImageResource(R.drawable.transparent);
