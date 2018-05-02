@@ -619,6 +619,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     // callback to OnTurnBasedMatchUpdated(), which will show the game
     // UI.
     public void startMatch(TurnBasedMatch match) {
+        mMatch = match;
         squares = new Square[8][8];
         game = new ChessGame();
         game.setPlayerWhite(true);
