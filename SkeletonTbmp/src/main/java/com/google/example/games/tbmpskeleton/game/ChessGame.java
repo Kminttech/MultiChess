@@ -32,6 +32,7 @@ public class ChessGame {
 
     // Move and turn information
     private boolean whiteTurn;
+    private boolean playerWhite;
 
     // Castling information
     private King K, k;
@@ -92,6 +93,8 @@ public class ChessGame {
     public boolean isWhitesTurn() {
         return whiteTurn;
     }
+
+    public boolean isPlayerWhite() { return playerWhite; }
 
     /**
      * Moves the piece at the source location to the specified destination. <br>
