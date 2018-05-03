@@ -32,7 +32,6 @@ public class ChessGame {
 
     // Move and turn information
     private boolean whiteTurn;
-    private boolean playerWhite;
 
     // Castling information
     private King K, k;
@@ -57,12 +56,12 @@ public class ChessGame {
         }
     }
 
-    public ChessGame(){
+    public ChessGame(boolean whiteTurn){
         super();
         this.grid = new ChessBoard(this);
         this.black_locs = new HashSet(16);
         this.white_locs = new HashSet(16);
-        this.whiteTurn = true;
+        this.whiteTurn = whiteTurn;
         defaultPosition();
         updateControlledLocations();
         for (ChessPiece p : chessPieces) {
@@ -104,12 +103,6 @@ public class ChessGame {
      */
     public boolean isWhitesTurn() {
         return whiteTurn;
-    }
-
-    public boolean isPlayerWhite() { return playerWhite; }
-
-    public void setPlayerWhite(boolean playerWhite) {
-        this.playerWhite = playerWhite;
     }
 
     /**
@@ -167,8 +160,6 @@ public class ChessGame {
         if((p.isWhite() && p.getLocation().getRow() >= 7) || (!p.isWhite() && p.getLocation().getRow() <= 0)){
             //Promote Pawns
         }
-        // Switch turns.
-        whiteTurn = !whiteTurn;
 
         boolean inCheck = isInCheck();
         for (ChessPiece chessPiece : chessPieces)

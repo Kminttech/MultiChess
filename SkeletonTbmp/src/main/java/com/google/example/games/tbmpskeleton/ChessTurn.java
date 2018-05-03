@@ -14,9 +14,14 @@ import java.nio.charset.Charset;
 public class ChessTurn {
     public static final String TAG = "EBTurn";
     public int[][] data;
+    public boolean whiteTurn;
 
-    public ChessTurn(ChessBoard curBoard) {
+    public ChessTurn(){
+    }
+
+    public ChessTurn(ChessBoard curBoard, boolean whiteTurn) {
         data = curBoard.getIntArray();
+        this.whiteTurn = whiteTurn;
     }
 
     // This is the byte array we will write out to the TBMP API.
@@ -26,6 +31,7 @@ public class ChessTurn {
         try {
             //retVal.put("data", new JSONArray(data);
             retVal = new JSONArray(data);
+            retVal.put(whiteTurn);
 
         } catch (JSONException e) {
             Log.e("ChessTurn", "There was an issue writing JSON!", e);
@@ -39,7 +45,7 @@ public class ChessTurn {
     }
 
     // Creates a new instance of ChessTurn.
-    static public int[][] unpersist(byte[] byteArray) {
+    static public ChessTurn unpersist(byte[] byteArray) {
 
         if (byteArray == null) {
             Log.d(TAG, "Empty array---possible bug.");
@@ -56,25 +62,20 @@ public class ChessTurn {
 
         Log.d(TAG, "====UNPERSIST \n" + st);
 
-        int[][] retVal = new int[8][8];
+        ChessTurn retVal = new ChessTurn();
+        retVal.data = new int[8][8];
 
         try {
             JSONArray obj = new JSONArray(st);
 
-            /*if (obj.has("data")) {
-                retVal = (int[][]) obj.get("data");
-            }*/
             if (obj.get(0) != null) {
-                //int test[] = (int []) obj.getInt(0);
-                //int test2[] = obj.getInt(1);
                 for (int i = 0; i < 8; i++) {
                     for (int j = 0; j < 8; j++) {
-                        retVal[i][j] = obj.getJSONArray(i).getInt(j);
-                        int fgaewsr = 0;
+                        retVal.data[i][j] = obj.getJSONArray(i).getInt(j);
                     }
                 }
-                //retVal = (int[][]) obj.get(0);
             }
+            retVal.whiteTurn = obj.getBoolean(8);
         } catch (JSONException e) {
             Log.e("ChessTurn", "There was an issue parsing JSON!", e);
         }
