@@ -31,4 +31,9 @@ public class Queen extends ChessPiece {
         }
         return locs;
     }
+
+    @Override
+    public int representation() {
+        return 2 * (isWhite() ? 1 : -1);
+    }
 }

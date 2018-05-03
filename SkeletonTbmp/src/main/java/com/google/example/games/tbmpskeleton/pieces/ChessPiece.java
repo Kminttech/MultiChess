@@ -145,4 +145,6 @@ public abstract class ChessPiece {
     boolean isSameColor(ChessPiece p) {
         return isWhite == p.isWhite;
     }
+
+    public abstract int representation();
 }

@@ -1,9 +1,17 @@
 package com.google.example.games.tbmpskeleton.grid;
 
 
+import com.google.example.games.tbmpskeleton.game.ChessGame;
+import com.google.example.games.tbmpskeleton.pieces.Bishop;
 import com.google.example.games.tbmpskeleton.pieces.ChessPiece;
+import com.google.example.games.tbmpskeleton.pieces.King;
+import com.google.example.games.tbmpskeleton.pieces.Knight;
+import com.google.example.games.tbmpskeleton.pieces.Pawn;
+import com.google.example.games.tbmpskeleton.pieces.Queen;
+import com.google.example.games.tbmpskeleton.pieces.Rook;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,14 +21,16 @@ import java.util.Set;
  */
 public class ChessBoard implements Grid<ChessPiece> {
     private HashMap<Location, ChessPiece> map;
+    private ChessGame game;
     private boolean inverted;
 
     /**
      * Create a new empty Chessoard.
      */
-    public ChessBoard() {
+    public ChessBoard(ChessGame game) {
         super();
-        map = new HashMap<Location, ChessPiece>(32);
+        this.game = game;
+        map = new HashMap(32);
     }
 
     public ChessBoard(Set<Map.Entry<Location, ChessPiece>> entrySet) {
@@ -90,5 +100,53 @@ public class ChessBoard implements Grid<ChessPiece> {
     @Override
     public void remove(Location loc) {
         map.remove(loc);
+    }
+
+    public int[][] getIntArray(){
+        int[][] board = new int[8][8];
+        Iterator it = map.entrySet().iterator();
+        while (it.hasNext()){
+            Map.Entry<Location, ChessPiece> pair = (Map.Entry) it.next();
+            int x = pair.getKey().getCol();
+            int y = pair.getKey().getRow();
+            int rep = pair.getValue().representation();
+            board[x][y] = rep;
+        }
+        return board;
+    }
+
+    public void setFromIntArray(int[][] board){
+        map = new HashMap<>(32);
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
+                if(board[i][j] != 0){
+                    if(board[i][j] == 1){
+                        map.put(new Location(i, j), new King(true, game, new Location(i, j)));
+                    }else if(board[i][j] == 2){
+                        map.put(new Location(i, j), new Queen(true, game, new Location(i, j)));
+                    }else if(board[i][j] == 3){
+                        map.put(new Location(i, j), new Bishop(true, game, new Location(i, j)));
+                    }else if(board[i][j] == 4){
+                        map.put(new Location(i, j), new Knight(true, game, new Location(i, j)));
+                    }else if(board[i][j] == 5){
+                        map.put(new Location(i, j), new Rook(true, game, new Location(i, j)));
+                    }else if(board[i][j] == 6){
+                        map.put(new Location(i, j), new Pawn(true, game, new Location(i, j)));
+                    }else if(board[i][j] == -1){
+                        map.put(new Location(i, j), new King(false, game, new Location(i, j)));
+                    }else if(board[i][j] == -2){
+                        map.put(new Location(i, j), new Queen(false, game, new Location(i, j)));
+                    }else if(board[i][j] == -3){
+                        map.put(new Location(i, j), new Bishop(false, game, new Location(i, j)));
+                    }else if(board[i][j] == -4){
+                        map.put(new Location(i, j), new Knight(false, game, new Location(i, j)));
+                    }else if(board[i][j] == -5){
+                        map.put(new Location(i, j), new Rook(false, game, new Location(i, j)));
+                    }else if(board[i][j] == -6){
+                        map.put(new Location(i, j), new Pawn(false, game, new Location(i, j)));
+                    }
+                }
+            }
+        }
     }
 }

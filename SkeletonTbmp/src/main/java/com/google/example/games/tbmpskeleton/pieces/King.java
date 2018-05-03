@@ -47,4 +47,9 @@ public class King extends ChessPiece {
         }
         return locs;
     }
+
+    @Override
+    public int representation() {
+        return 1 * (isWhite() ? 1 : -1);
+    }
 }

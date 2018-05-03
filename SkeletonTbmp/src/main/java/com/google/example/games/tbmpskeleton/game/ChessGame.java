@@ -59,7 +59,7 @@ public class ChessGame {
 
     public ChessGame(){
         super();
-        this.grid = new ChessBoard();
+        this.grid = new ChessBoard(this);
         this.black_locs = new HashSet(16);
         this.white_locs = new HashSet(16);
         this.whiteTurn = true;

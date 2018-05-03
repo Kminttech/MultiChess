@@ -93,7 +93,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     // This is the current match data after being unpersisted.
     // Do not retain references to match data once you have
     // taken an action on the match, such as takeTurn()
-    public ChessTurn mTurnData;
+    public int[][] mTurnData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -360,7 +360,8 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     // Switch to gameplay view.
     public void setGameplayUI() {
         squares = new Square[8][8];
-        game = new ChessGame(mTurnData.data);
+        game = new ChessGame();
+        game.getGrid().setFromIntArray(mTurnData);
         game.setPlayerWhite(true);
         generateBoard();
         findViewById(R.id.matchup_layout).setVisibility(View.GONE);

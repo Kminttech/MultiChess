@@ -31,4 +31,9 @@ public class Bishop extends ChessPiece {
         }
         return locs;
     }
+
+    @Override
+    public int representation() {
+        return 3 * (isWhite() ? 1 : -1);
+    }
 }

@@ -31,4 +31,9 @@ public class Rook extends ChessPiece {
         }
         return locs;
     }
+
+    @Override
+    public int representation() {
+        return 5 * (isWhite() ? 1 : -1);
+    }
 }

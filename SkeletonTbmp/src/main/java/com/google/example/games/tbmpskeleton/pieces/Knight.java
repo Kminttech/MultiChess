@@ -34,4 +34,9 @@ public class Knight extends ChessPiece {
         }
         return locs;
     }
+
+    @Override
+    public int representation() {
+        return 4 * (isWhite() ? 1 : -1);
+    }
 }

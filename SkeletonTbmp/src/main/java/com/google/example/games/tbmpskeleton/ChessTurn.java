@@ -12,14 +12,10 @@ import java.nio.charset.Charset;
 
 public class ChessTurn {
     public static final String TAG = "EBTurn";
-    public ChessBoard data;
-
-    public ChessTurn() {
-        data = new ChessBoard();
-    }
+    public int[][] data;
 
     public ChessTurn(ChessBoard curBoard) {
-        data = curBoard;
+        data = curBoard.getIntArray();
     }
 
     // This is the byte array we will write out to the TBMP API.
@@ -41,11 +37,11 @@ public class ChessTurn {
     }
 
     // Creates a new instance of ChessTurn.
-    static public ChessTurn unpersist(byte[] byteArray) {
+    static public int[][] unpersist(byte[] byteArray) {
 
         if (byteArray == null) {
             Log.d(TAG, "Empty array---possible bug.");
-            return new ChessTurn();
+            return null;
         }
 
         String st = null;
@@ -58,13 +54,13 @@ public class ChessTurn {
 
         Log.d(TAG, "====UNPERSIST \n" + st);
 
-        ChessTurn retVal = new ChessTurn();
+        int[][] retVal = new int[8][8];
 
         try {
             JSONObject obj = new JSONObject(st);
 
             if (obj.has("data")) {
-                retVal.data = (ChessBoard) obj.get("data");
+                retVal = (int[][]) obj.get("data");
             }
         } catch (JSONException e) {
             Log.e("ChessTurn", "There was an issue parsing JSON!", e);
