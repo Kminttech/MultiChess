@@ -62,6 +62,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     private ChessGame game;
     private LinearLayout boardVertical;
     private ArrayList<Location> possibleMoves;
+    private boolean generatedBoard;
 
     public static final String TAG = "ChessActivity";
 
@@ -99,6 +100,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        generatedBoard = false;
 
         // Create the Google API Client with access to Games
         // Create the client used to sign in.
@@ -363,7 +365,9 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         game = new ChessGame();
         game.getGrid().setFromIntArray(mTurnData);
         game.setPlayerWhite(true);
-        generateBoard();
+        if(!generatedBoard){
+            generateBoard();
+        }
         findViewById(R.id.matchup_layout).setVisibility(View.GONE);
         findViewById(R.id.gameplay_layout).setVisibility(View.VISIBLE);
     }
@@ -621,7 +625,9 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         squares = new Square[8][8];
         game = new ChessGame();
         game.setPlayerWhite(true);
-        generateBoard();
+        if(!generatedBoard){
+            generateBoard();
+        }
         findViewById(R.id.matchup_layout).setVisibility(View.GONE);
         findViewById(R.id.gameplay_layout).setVisibility(View.VISIBLE);
 
@@ -1211,7 +1217,9 @@ public class ChessActivity extends Activity implements View.OnClickListener {
 
     public void reset() {
         squares = new Square[8][8];
-        generateBoard();
+        if(!generatedBoard){
+            generateBoard();
+        }
         game = new ChessGame();
     }
 }
