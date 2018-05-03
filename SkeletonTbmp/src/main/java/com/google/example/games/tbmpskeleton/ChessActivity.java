@@ -186,12 +186,12 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         // This is *NOT* required; if you do not register a handler for
         // invitation events, you will get standard notifications instead.
         // Standard notifications may be preferable behavior in many cases.
-        mInvitationsClient.registerInvitationCallback(mInvitationCallback);
+        //mInvitationsClient.registerInvitationCallback(mInvitationCallback);
 
         // Likewise, we are registering the optional MatchUpdateListener, which
         // will replace notifications you would get otherwise. You do *NOT* have
         // to register a MatchUpdateListener.
-        mTurnBasedMultiplayerClient.registerTurnBasedMatchUpdateCallback(mMatchUpdateCallback);
+        //mTurnBasedMultiplayerClient.registerTurnBasedMatchUpdateCallback(mMatchUpdateCallback);
     }
 
     private void onDisconnected() {
@@ -862,6 +862,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         return false;
     }
 
+    //TODO question Kevin about this method
     private void playTurn(TurnBasedMatch match) {
         String nextParticipantId = getNextParticipantId();
 
