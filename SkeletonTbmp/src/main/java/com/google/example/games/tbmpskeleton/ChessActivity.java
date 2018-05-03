@@ -75,9 +75,6 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     // Client used to interact with the Invitation system.
     private InvitationsClient mInvitationsClient = null;
 
-    // Local convenience pointers
-    private String mMyPlayerId;
-
     private AlertDialog mAlertDialog;
 
     // For our intents
@@ -265,68 +262,6 @@ public class ChessActivity extends Activity implements View.OnClickListener {
                 })
                 .addOnFailureListener(createFailureListener("There was a problem creating a match!"));
     }
-
-    // In-game controls
-//
-//    // Leave the game during your turn. Note that there is a separate
-//    // mTurnBasedMultiplayerClient.leaveMatch() if you want to leave NOT on your turn.
-//    public void onLeaveClicked(View view) {
-//        showSpinner();
-//        String nextParticipantId = getNextParticipantId();
-//
-//        mTurnBasedMultiplayerClient.leaveMatchDuringTurn(mMatch.getMatchId(), nextParticipantId)
-//                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void aVoid) {
-//                        onLeaveMatch();
-//                    }
-//                })
-//                .addOnFailureListener(createFailureListener("There was a problem leaving the match!"));
-//
-//        setViewVisibility();
-//    }
-//
-//
-//    // Finish the game. Sometimes, this is your only choice.
-//    public void onFinishClicked(View view) {
-//        showSpinner();
-//        mTurnBasedMultiplayerClient.finishMatch(mMatch.getMatchId())
-//                .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
-//                    @Override
-//                    public void onSuccess(TurnBasedMatch turnBasedMatch) {
-//                        onUpdateMatch(turnBasedMatch);
-//                    }
-//                })
-//                .addOnFailureListener(createFailureListener("There was a problem finishing the match!"));
-//
-//        isDoingTurn = false;
-//        setViewVisibility();
-//    }
-//
-//
-//    // Upload your new gamestate, then take a turn, and pass it on to the next
-//    // player.
-//    public void onDoneClicked(View view) {
-//        showSpinner();
-//
-//        String nextParticipantId = getNextParticipantId();
-//        // Create the next turn
-//        //mTurnData.turnCounter += 1;
-//        //mTurnData.data = mDataView.getText().toString();
-//
-//        mTurnBasedMultiplayerClient.takeTurn(mMatch.getMatchId(),
-//                mTurnData.persist(), nextParticipantId)
-//                .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
-//                    @Override
-//                    public void onSuccess(TurnBasedMatch turnBasedMatch) {
-//                        onUpdateMatch(turnBasedMatch);
-//                    }
-//                })
-//                .addOnFailureListener(createFailureListener("There was a problem taking a turn!"));
-//
-//        mTurnData = null;
-//    }
-
 
     // Sign-in, Sign out behavior
 
@@ -641,26 +576,6 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         }
         findViewById(R.id.matchup_layout).setVisibility(View.GONE);
         findViewById(R.id.gameplay_layout).setVisibility(View.VISIBLE);
-
-//        mTurnData = new ChessTurn();
-//        // Some basic turn data
-//        mTurnData.data = "First turn";
-//
-//        mMatch = match;
-//
-//        String myParticipantId = mMatch.getParticipantId(mPlayerId);
-//
-//        showSpinner();
-//
-//        mTurnBasedMultiplayerClient.takeTurn(match.getMatchId(),
-//            mTurnData.persist(), myParticipantId)
-//            .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
-//            @Override
-//            public void onSuccess(TurnBasedMatch turnBasedMatch) {
-//            updateMatch(turnBasedMatch);
-//            }
-//            }).addOnFailureListener(createFailureListener("There was a problem taking a turn!"));
-//
     }
 
     // If you choose to rematch, then call it and wait for a response.
