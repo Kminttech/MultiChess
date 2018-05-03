@@ -371,6 +371,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
             generateBoard();
             generatedBoard = true;
         }
+        renderBoard();
     }
 
     // Helpful dialogs
@@ -758,14 +759,14 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         setViewVisibility();
     }
 
-    private void onCancelMatch(String matchId) {
+    /*private void onCancelMatch(String matchId) {
         dismissSpinner();
 
         isDoingTurn = false;
 
         showWarning("Match", "This match (" + matchId + ") was canceled.  " +
                 "All other players will have their game ended.");
-    }
+    }*/
 
     private void onInitiateMatch(TurnBasedMatch match) {
         dismissSpinner();
@@ -779,12 +780,12 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         startMatch(match);
     }
 
-    private void onLeaveMatch() {
+    /*private void onLeaveMatch() {
         dismissSpinner();
 
         isDoingTurn = false;
         showWarning("Left", "You've left this match.");
-    }
+    }*/
 
 
     public void onUpdateMatch(TurnBasedMatch match) {
@@ -871,7 +872,6 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         return false;
     }
 
-    //TODO question Kevin about this method
     private void playTurn(TurnBasedMatch match) {
         String nextParticipantId = getNextParticipantId();
 
@@ -879,18 +879,6 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         // including the current player's turn.
         byte[] gameData = new ChessTurn(game.getGrid()).persist();
 
-        /*Games.getTurnBasedMultiplayerClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                .takeTurn(match.getMatchId(), gameData, nextParticipantId)
-                .addOnCompleteListener(new OnCompleteListener<TurnBasedMatch>() {
-                    @Override
-                    public void onComplete(@NonNull Task<TurnBasedMatch> task) {
-                        if (task.isSuccessful()) {
-                            TurnBasedMatch match = task.getResult();
-                        } else {
-                            // Handle exceptions.
-                        }
-                    }
-                });*/
         Games.getTurnBasedMultiplayerClient(this, GoogleSignIn.getLastSignedInAccount(this))
                 .takeTurn(match.getMatchId(), gameData, nextParticipantId)
                 .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
@@ -1226,12 +1214,12 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    public void reset() {
+    /*public void reset() {
         if(!generatedBoard){
             squares = new Square[8][8];
             generateBoard();
             generatedBoard = true;
         }
         game = new ChessGame();
-    }
+    }*/
 }
