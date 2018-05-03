@@ -23,7 +23,6 @@ public class ChessBoard implements Grid<ChessPiece> {
     private HashMap<Location, ChessPiece> map;
     private ChessGame game;
     private boolean inverted;
-
     /**
      * Create a new empty Chessoard.
      */

@@ -188,12 +188,12 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         // This is *NOT* required; if you do not register a handler for
         // invitation events, you will get standard notifications instead.
         // Standard notifications may be preferable behavior in many cases.
-        //mInvitationsClient.registerInvitationCallback(mInvitationCallback);
+        mInvitationsClient.registerInvitationCallback(mInvitationCallback);
 
         // Likewise, we are registering the optional MatchUpdateListener, which
         // will replace notifications you would get otherwise. You do *NOT* have
         // to register a MatchUpdateListener.
-        //mTurnBasedMultiplayerClient.registerTurnBasedMatchUpdateCallback(mMatchUpdateCallback);
+        mTurnBasedMultiplayerClient.registerTurnBasedMatchUpdateCallback(mMatchUpdateCallback);
     }
 
     private void onDisconnected() {
@@ -361,15 +361,15 @@ public class ChessActivity extends Activity implements View.OnClickListener {
 
     // Switch to gameplay view.
     public void setGameplayUI() {
-        squares = new Square[8][8];
+        isDoingTurn = true;
+        setViewVisibility();
         game = new ChessGame();
         game.getGrid().setFromIntArray(mTurnData);
         game.setPlayerWhite(true);
         if(!generatedBoard){
+            squares = new Square[8][8];
             generateBoard();
         }
-        findViewById(R.id.matchup_layout).setVisibility(View.GONE);
-        findViewById(R.id.gameplay_layout).setVisibility(View.VISIBLE);
     }
 
     // Helpful dialogs
@@ -622,10 +622,10 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     // UI.
     public void startMatch(TurnBasedMatch match) {
         mMatch = match;
-        squares = new Square[8][8];
         game = new ChessGame();
         game.setPlayerWhite(true);
         if(!generatedBoard){
+            squares = new Square[8][8];
             generateBoard();
         }
         findViewById(R.id.matchup_layout).setVisibility(View.GONE);
@@ -877,7 +877,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         // including the current player's turn.
         byte[] gameData = new ChessTurn(game.getGrid()).persist();
 
-        Games.getTurnBasedMultiplayerClient(this, GoogleSignIn.getLastSignedInAccount(this))
+        /*Games.getTurnBasedMultiplayerClient(this, GoogleSignIn.getLastSignedInAccount(this))
                 .takeTurn(match.getMatchId(), gameData, nextParticipantId)
                 .addOnCompleteListener(new OnCompleteListener<TurnBasedMatch>() {
                     @Override
@@ -888,7 +888,16 @@ public class ChessActivity extends Activity implements View.OnClickListener {
                             // Handle exceptions.
                         }
                     }
-                });
+                });*/
+        Games.getTurnBasedMultiplayerClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                .takeTurn(match.getMatchId(), gameData, nextParticipantId)
+                .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
+                    @Override
+                    public void onSuccess(TurnBasedMatch turnBasedMatch) {
+                        onUpdateMatch(turnBasedMatch);
+                    }
+                })
+                .addOnFailureListener(createFailureListener("There was a problem taking a turn!"));
     }
 
     @Override

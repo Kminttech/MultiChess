@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.example.games.tbmpskeleton.grid.ChessBoard;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,10 +21,11 @@ public class ChessTurn {
 
     // This is the byte array we will write out to the TBMP API.
     public byte[] persist() {
-        JSONObject retVal = new JSONObject();
+        JSONArray retVal = null;
 
         try {
-            retVal.put("data", data);
+            //retVal.put("data", new JSONArray(data);
+            retVal = new JSONArray(data);
 
         } catch (JSONException e) {
             Log.e("ChessTurn", "There was an issue writing JSON!", e);
@@ -57,10 +59,21 @@ public class ChessTurn {
         int[][] retVal = new int[8][8];
 
         try {
-            JSONObject obj = new JSONObject(st);
+            JSONArray obj = new JSONArray(st);
 
-            if (obj.has("data")) {
+            /*if (obj.has("data")) {
                 retVal = (int[][]) obj.get("data");
+            }*/
+            if (obj.get(0) != null) {
+                //int test[] = (int []) obj.getInt(0);
+                //int test2[] = obj.getInt(1);
+                for (int i = 0; i < 8; i++) {
+                    for (int j = 0; j < 8; j++) {
+                        retVal[i][j] = obj.getJSONArray(i).getInt(j);
+                        int fgaewsr = 0;
+                    }
+                }
+                //retVal = (int[][]) obj.get(0);
             }
         } catch (JSONException e) {
             Log.e("ChessTurn", "There was an issue parsing JSON!", e);
