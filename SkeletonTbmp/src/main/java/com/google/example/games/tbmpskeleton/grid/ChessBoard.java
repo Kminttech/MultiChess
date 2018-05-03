@@ -10,6 +10,7 @@ import com.google.example.games.tbmpskeleton.pieces.Pawn;
 import com.google.example.games.tbmpskeleton.pieces.Queen;
 import com.google.example.games.tbmpskeleton.pieces.Rook;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -74,7 +75,7 @@ public class ChessBoard implements Grid<ChessPiece> {
 
     @Override
     public boolean isValid(Location loc) {
-        return (loc.getCol() >= 0 && loc.getCol() < 8) && (loc.getRow() >= 0 && loc.getRow() < 8);
+        return loc != null && (loc.getCol() >= 0 && loc.getCol() < 8) && (loc.getRow() >= 0 && loc.getRow() < 8);
     }
 
     @Override
@@ -114,38 +115,63 @@ public class ChessBoard implements Grid<ChessPiece> {
         return board;
     }
 
-    public void setFromIntArray(int[][] board){
-        map = new HashMap<>(32);
+    public ArrayList<ChessPiece> setFromIntArray(int[][] board){
+        ArrayList<ChessPiece> arr = new ArrayList<>();
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
                 if(board[j][i] != 0){
                     if(board[j][i] == 1){
-                        map.put(new Location(i, j), new King(true, game, new Location(i, j)));
+                        ChessPiece p = new King(true, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }else if(board[j][i] == 2){
-                        map.put(new Location(i, j), new Queen(true, game, new Location(i, j)));
+                        ChessPiece p = new Queen(true, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }else if(board[j][i] == 3){
-                        map.put(new Location(i, j), new Bishop(true, game, new Location(i, j)));
+                        ChessPiece p = new Bishop(true, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }else if(board[j][i] == 4){
-                        map.put(new Location(i, j), new Knight(true, game, new Location(i, j)));
+                        ChessPiece p = new Knight(true, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }else if(board[j][i] == 5){
-                        map.put(new Location(i, j), new Rook(true, game, new Location(i, j)));
+                        ChessPiece p = new Rook(true, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }else if(board[j][i] == 6){
-                        map.put(new Location(i, j), new Pawn(true, game, new Location(i, j)));
+                        ChessPiece p = new Pawn(true, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }else if(board[j][i] == -1){
-                        map.put(new Location(i, j), new King(false, game, new Location(i, j)));
+                        ChessPiece p = new King(false, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }else if(board[j][i] == -2){
-                        map.put(new Location(i, j), new Queen(false, game, new Location(i, j)));
+                        ChessPiece p = new Queen(false, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }else if(board[j][i] == -3){
-                        map.put(new Location(i, j), new Bishop(false, game, new Location(i, j)));
+                        ChessPiece p = new Bishop(false, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }else if(board[j][i] == -4){
-                        map.put(new Location(i, j), new Knight(false, game, new Location(i, j)));
+                        ChessPiece p = new Knight(false, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }else if(board[j][i] == -5){
-                        map.put(new Location(i, j), new Rook(false, game, new Location(i, j)));
+                        ChessPiece p = new Rook(false, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }else if(board[j][i] == -6){
-                        map.put(new Location(i, j), new Pawn(false, game, new Location(i, j)));
+                        ChessPiece p = new Pawn(false, game, new Location(i, j));
+                        map.put(new Location(i, j), p);
+                        arr.add(p);
                     }
                 }
             }
         }
+        return arr;
     }
 }

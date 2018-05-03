@@ -43,4 +43,7 @@ public class Move {
     public Location getSource() {
         return src;
     }
+
+    @Override
+    public int hashCode() { return src.hashCode() + dest.hashCode(); }
 }

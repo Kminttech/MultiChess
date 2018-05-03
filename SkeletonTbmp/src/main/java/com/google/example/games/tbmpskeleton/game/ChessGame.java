@@ -34,7 +34,7 @@ public class ChessGame {
     private boolean whiteTurn;
 
     // Castling information
-    private King K, k;
+    private King whiteKing, blackKing;
 
     // Moves when in check
     private HashSet<Move> escape_moves;
@@ -44,28 +44,42 @@ public class ChessGame {
      *
      * @param grid The board on which the game will be played.
      */
-    public ChessGame(ChessBoard grid) {
+    public ChessGame(int[][] grid, boolean whiteTurn) {
         super();
-        this.grid = grid;
-        this.black_locs = new HashSet(16);
-        this.white_locs = new HashSet(16);
-        this.whiteTurn = true;
+        this.black_locs = new HashSet(64);
+        this.white_locs = new HashSet(64);
+        this.grid = new ChessBoard(this);
+        chessPieces = this.grid.setFromIntArray(grid);
+        this.whiteTurn = whiteTurn;
         updateControlledLocations();
         for (ChessPiece p : chessPieces) {
             p.update();
+            if(p instanceof King){
+                if(p.isWhite()){
+                    whiteKing = (King) p;
+                }else {
+                    blackKing = (King) p;
+                }
+            }
+        }
+        if(isInCheck()){
+            escape_moves = getEscapeMoves();
         }
     }
 
     public ChessGame(boolean whiteTurn){
         super();
+        this.black_locs = new HashSet(64);
+        this.white_locs = new HashSet(64);
         this.grid = new ChessBoard(this);
-        this.black_locs = new HashSet(16);
-        this.white_locs = new HashSet(16);
         this.whiteTurn = whiteTurn;
         defaultPosition();
         updateControlledLocations();
         for (ChessPiece p : chessPieces) {
             p.update();
+        }
+        if(isInCheck()){
+            escape_moves = getEscapeMoves();
         }
     }
 
@@ -157,7 +171,7 @@ public class ChessGame {
             chessPieces.remove(captured);
         }
 
-        if((p.isWhite() && p.getLocation().getRow() >= 7) || (!p.isWhite() && p.getLocation().getRow() <= 0)){
+        if(p instanceof Pawn && ((p.isWhite() && p.getLocation().getRow() >= 7) || (!p.isWhite() && p.getLocation().getRow() <= 0))){
             //Promote Pawns
         }
 
@@ -187,16 +201,6 @@ public class ChessGame {
         }
     }
 
-    public boolean addPiece(ChessPiece p, Location loc){
-        if(!chessPieces.contains(p)) {
-            chessPieces.add(p);
-            grid.put(loc, p);
-            whiteTurn = !whiteTurn;
-            return true;
-        }
-        return false;
-    }
-
     /**
      * Sets up a brand new game of Shogi. Creates a new chessPieces and sets up the
      * chessPieces on the grid.
@@ -204,10 +208,10 @@ public class ChessGame {
     private void defaultPosition() {
         chessPieces = new ArrayList(32);
         // Kings
-        K = new King(true, this, new Location(0, 4));
-        k = new King(false, this, new Location(7, 4));
-        chessPieces.add(k);
-        chessPieces.add(K);
+        whiteKing = new King(true, this, new Location(0, 4));
+        blackKing = new King(false, this, new Location(7, 4));
+        chessPieces.add(blackKing);
+        chessPieces.add(whiteKing);
 
         Queen q1, q2;
         q1 = new Queen(true, this, new Location(0, 3));
@@ -297,12 +301,12 @@ public class ChessGame {
      * @return True if the current player moving is in check; false otherwise.
      */
     private boolean isInCheck() {
-        return isWhitesTurn() ? getLocsControlledByBlack().contains(K.getLocation()) : getLocsControlledByWhite().contains(k.getLocation());
+        return isWhitesTurn() ? getLocsControlledByBlack().contains(whiteKing.getLocation()) : getLocsControlledByWhite().contains(blackKing.getLocation());
     }
 
     private void updateAllowedMoves() {
         HashSet<Location> enemy = isWhitesTurn() ? black_locs : white_locs;
-        King our_king = isWhitesTurn() ? K : k;
+        King our_king = isWhitesTurn() ? whiteKing : blackKing;
         ArrayList<ChessPiece> all_Chess_pieces = new ArrayList<ChessPiece>(chessPieces.size());
         for (ChessPiece p : chessPieces){
             all_Chess_pieces.add(p);

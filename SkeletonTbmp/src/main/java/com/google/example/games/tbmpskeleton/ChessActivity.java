@@ -363,14 +363,25 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     public void setGameplayUI() {
         isDoingTurn = true;
         setViewVisibility();
-        game = new ChessGame(mTurnData.whiteTurn);
-        game.getGrid().setFromIntArray(mTurnData.data);
+        game = new ChessGame(mTurnData.data, mTurnData.whiteTurn);
         if(!generatedBoard){
             squares = new Square[8][8];
             generateBoard();
             generatedBoard = true;
         }
         renderBoard();
+        if(game.isCheckmate()){
+            mTurnBasedMultiplayerClient.finishMatch(mMatch.getMatchId())
+                    .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
+                        @Override
+                        public void onSuccess(TurnBasedMatch turnBasedMatch) {
+                            onUpdateMatch(turnBasedMatch);
+                        }
+                    })
+                    .addOnFailureListener(createFailureListener("There was a problem finishing the match!"));
+            isDoingTurn = false;
+            setViewVisibility();
+        }
     }
 
     // Helpful dialogs
@@ -614,7 +625,6 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    //TODO implement chess determine color
     // startMatch() happens in response to the createTurnBasedMatch()
     // above. This is only called on success, so we should have a
     // valid match object. We're taking this opportunity to setup the
