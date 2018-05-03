@@ -118,30 +118,30 @@ public class ChessBoard implements Grid<ChessPiece> {
         map = new HashMap<>(32);
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
-                if(board[i][j] != 0){
-                    if(board[i][j] == 1){
+                if(board[j][i] != 0){
+                    if(board[j][i] == 1){
                         map.put(new Location(i, j), new King(true, game, new Location(i, j)));
-                    }else if(board[i][j] == 2){
+                    }else if(board[j][i] == 2){
                         map.put(new Location(i, j), new Queen(true, game, new Location(i, j)));
-                    }else if(board[i][j] == 3){
+                    }else if(board[j][i] == 3){
                         map.put(new Location(i, j), new Bishop(true, game, new Location(i, j)));
-                    }else if(board[i][j] == 4){
+                    }else if(board[j][i] == 4){
                         map.put(new Location(i, j), new Knight(true, game, new Location(i, j)));
-                    }else if(board[i][j] == 5){
+                    }else if(board[j][i] == 5){
                         map.put(new Location(i, j), new Rook(true, game, new Location(i, j)));
-                    }else if(board[i][j] == 6){
+                    }else if(board[j][i] == 6){
                         map.put(new Location(i, j), new Pawn(true, game, new Location(i, j)));
-                    }else if(board[i][j] == -1){
+                    }else if(board[j][i] == -1){
                         map.put(new Location(i, j), new King(false, game, new Location(i, j)));
-                    }else if(board[i][j] == -2){
+                    }else if(board[j][i] == -2){
                         map.put(new Location(i, j), new Queen(false, game, new Location(i, j)));
-                    }else if(board[i][j] == -3){
+                    }else if(board[j][i] == -3){
                         map.put(new Location(i, j), new Bishop(false, game, new Location(i, j)));
-                    }else if(board[i][j] == -4){
+                    }else if(board[j][i] == -4){
                         map.put(new Location(i, j), new Knight(false, game, new Location(i, j)));
-                    }else if(board[i][j] == -5){
+                    }else if(board[j][i] == -5){
                         map.put(new Location(i, j), new Rook(false, game, new Location(i, j)));
-                    }else if(board[i][j] == -6){
+                    }else if(board[j][i] == -6){
                         map.put(new Location(i, j), new Pawn(false, game, new Location(i, j)));
                     }
                 }

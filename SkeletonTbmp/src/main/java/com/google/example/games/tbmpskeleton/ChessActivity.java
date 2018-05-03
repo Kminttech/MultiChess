@@ -369,6 +369,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         if(!generatedBoard){
             squares = new Square[8][8];
             generateBoard();
+            generatedBoard = true;
         }
     }
 
@@ -627,6 +628,7 @@ public class ChessActivity extends Activity implements View.OnClickListener {
         if(!generatedBoard){
             squares = new Square[8][8];
             generateBoard();
+            generatedBoard = true;
         }
         findViewById(R.id.matchup_layout).setVisibility(View.GONE);
         findViewById(R.id.gameplay_layout).setVisibility(View.VISIBLE);
@@ -1225,9 +1227,10 @@ public class ChessActivity extends Activity implements View.OnClickListener {
     }
 
     public void reset() {
-        squares = new Square[8][8];
         if(!generatedBoard){
+            squares = new Square[8][8];
             generateBoard();
+            generatedBoard = true;
         }
         game = new ChessGame();
     }
